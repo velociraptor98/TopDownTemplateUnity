@@ -33,16 +33,14 @@ public class EnemyLogic : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void ChasePlayer()
     {
-        if(PatrolStart && PatrolEnd)
-        Patrol();
-        /*if (agent && destination)
+        if (agent && destination)
         {
             agent.SetDestination(destination.position);
         }
-        float distance = Vector3.Distance(destination.transform.position,agent.transform.position);
-        if(distance  < 1.5f)
+        float distance = Vector3.Distance(destination.transform.position, agent.transform.position);
+        if (distance < 1.5f)
         {
             agent.isStopped = true;
             agent.velocity = Vector3.zero;
@@ -50,7 +48,46 @@ public class EnemyLogic : MonoBehaviour
         else
         {
             agent.isStopped = false;
-        }*/
+        }
+    }
+    void PlayerSearch()
+    {
+        float distance = Vector3.Distance(agent.transform.position, destination.position); 
+        if(distance < 5.0f)
+        {
+            state = EnemyState.Chase;
+        }
+        else 
+        {
+            state = EnemyState.Patrol;
+        }
+    }
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = new Color(1, 0, 0, 0.25f);
+        Gizmos.DrawSphere(transform.position, 5.0f);
+    }
+    void Update()
+    {
+        switch(state)
+        {
+            case EnemyState.Idle:
+                PlayerSearch();
+                break;
+            case EnemyState.Patrol:
+                PlayerSearch();
+                if (PatrolStart && PatrolEnd)
+                    Patrol();
+                break;
+            case EnemyState.Chase:
+                ChasePlayer();
+                break;
+            case EnemyState.Attack:
+                break;
+
+        }
+        /*
+        */
     }
     void Patrol()
     {
