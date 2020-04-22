@@ -23,6 +23,11 @@ public class EnemyLogic : MonoBehaviour
     [SerializeField]
     private Transform PatrolEnd;
     private Vector3 CurrentPosition;
+    float meeleRadius = 3.0f;
+    const float MAX_ATTACK_COOLDOWN = 0.5f;
+    float attackCooldown = MAX_ATTACK_COOLDOWN;
+    [SerializeField]
+    private int health = 30;
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -40,14 +45,38 @@ public class EnemyLogic : MonoBehaviour
             agent.SetDestination(destination.position);
         }
         float distance = Vector3.Distance(destination.transform.position, agent.transform.position);
-        if (distance < 1.5f)
+        if (distance < 2.0f)
         {
             agent.isStopped = true;
             agent.velocity = Vector3.zero;
+            state = EnemyState.Attack;
         }
         else
         {
             agent.isStopped = false;
+        }
+    }
+    void UpdateAttack()
+    {
+        float distance = Vector3.Distance(this.transform.position, destination.position);
+        if(distance < meeleRadius)
+        {
+            attackCooldown -= Time.deltaTime;
+            if(attackCooldown < 0.0f)
+            {
+                PlayerController script = destination.GetComponent<PlayerController>();
+                if(script)
+                {
+                    script.TakeDamage(10);
+                    print(0);
+                }
+                attackCooldown = MAX_ATTACK_COOLDOWN;
+                
+            }
+        }
+        else
+        {
+            state = EnemyState.Chase;
         }
     }
     void PlayerSearch()
@@ -83,11 +112,10 @@ public class EnemyLogic : MonoBehaviour
                 ChasePlayer();
                 break;
             case EnemyState.Attack:
+                UpdateAttack();
                 break;
 
         }
-        /*
-        */
     }
     void Patrol()
     {
@@ -109,5 +137,13 @@ public class EnemyLogic : MonoBehaviour
                 }
             }
         
+    }
+   public void takeDamage(int hitPoint)
+    {
+        health -= hitPoint;
+        if(health<=0)
+        {
+            Destroy(this.gameObject);
+        }
     }
 }

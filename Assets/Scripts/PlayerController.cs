@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField]
     private int PlayerHealth = 100;
     [SerializeField]
     private float _speed = 5.0f;
@@ -99,5 +100,10 @@ public class PlayerController : MonoBehaviour
     public  void TakeDamage(int damagePoints)
     {
         PlayerHealth -= damagePoints;
+        SetHealthText();
+        if(PlayerHealth<=0)
+        {
+            Destroy(this.gameObject);
+        }
     }
 }
